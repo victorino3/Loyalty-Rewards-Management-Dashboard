@@ -1,0 +1,36 @@
+<template>
+    <lightning-card title="Customer List">
+        <!-- Search Input -->
+        <div class="slds-p-around_medium">
+            <lightning-input
+                label="Search Customers"
+                type="search"
+                onchange={handleSearchChange}
+                placeholder="Type a name..."
+            ></lightning-input>
+        </div>
+
+        <!-- Results -->
+        <template if:true={customers}>
+            <div class="slds-grid slds-wrap slds-p-around_medium">
+                <template for:each={customers} for:item="cust">
+                    <div key={cust.Id} class="slds-col slds-size_1-of-2 slds-p-around_small">
+                        <c-customer-tile customer={cust}></c-customer-tile>
+                    </div>
+                </template>
+            </div>
+        </template>
+
+        <!-- No Results -->
+        <template if:true={customers}>
+            <template if:true={isNoResult}>
+                <p class="slds-p-around_medium slds-text-body_regular">No customers found.</p>
+            </template>
+        </template>
+
+        <!-- Error -->
+        <template if:true={error}>
+            <p class="slds-text-color_error slds-p-around_medium">{error}</p>
+        </template>
+    </lightning-card>
+</template>
