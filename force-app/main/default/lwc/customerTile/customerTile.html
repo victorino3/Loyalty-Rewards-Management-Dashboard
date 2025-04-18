@@ -1,11 +1,10 @@
 <template>
-    <lightning-card title={customer.Name}>
-        <div class="slds-box slds-theme_default slds-m-around_x-small">
-            <p><strong>Name:</strong> {customer.Name}</p> <!-- 👈 Add this -->
+    <lightning-card>
+        <div class="slds-box slds-theme_default slds-m-around_x-small" onclick={handleClick}>
+            <p><strong>Name:</strong> {customer.Name}</p>
             <p><strong>Email:</strong> {customer.Email__c}</p>
             <p><strong>Points:</strong> {customer.Points_Balance__c}</p>
             <p><strong>Tier:</strong> {customer.Tier__c}</p>
         </div>
     </lightning-card>
-    
 </template>

@@ -1,39 +1,55 @@
 import { LightningElement, track } from 'lwc';
+import { NavigationMixin } from 'lightning/navigation';
 import searchCustomers from '@salesforce/apex/CustomerController.searchCustomers';
 
-export default class CustomerList extends LightningElement {
+export default class CustomerList extends NavigationMixin(LightningElement)  {
     @track customers;
-    error;
+    @track error;
+    @track isNoResult = false;
     searchKey = '';
     delayTimeout;
+    @track isLoading = false;
     /* eslint-disable @lwc/lwc/no-async-operation */
     handleSearchChange(event) {
-        // Clear the previous timer if user is still typing
         window.clearTimeout(this.delayTimeout);
         const value = event.target.value;
 
-        // Set a new timer
         this.delayTimeout = setTimeout(() => {
             this.searchKey = value;
             this.findCustomers();
         }, 300); // Debounce delay in ms
     }
-
+    
     findCustomers() {
         if (!this.searchKey) {
             this.customers = [];
+            this.isNoResult = false;
             return;
         }
-
-    searchCustomers({ keyword: this.searchKey })
-        .then((result) => {
+        this.isLoading = true;
+        searchCustomers({ keyword: this.searchKey })
+            .then((result) => {
                 this.customers = result;
+                this.isNoResult = result.length === 0;
                 this.error = undefined;
-        })
-        .catch((error) => {
-                this.error = error.body.message;
-                this.customers = undefined;
+            })
+            .catch((error) => {
+                this.error = error.body?.message || 'Unknown error';
+                this.customers = [];
             });
     }
 /* eslint-enable @lwc/lwc/no-async-operation */
+    handleCustomerNavigate(event) {
+        const customerId = event.detail;
+
+        this[NavigationMixin.Navigate]({
+            type: 'standard__component',
+            attributes: {
+                componentName: 'c__CustomerDetailAura'
+            },
+            state: {
+                c__recordId: customerId
+            }
+        });
+    }
 }

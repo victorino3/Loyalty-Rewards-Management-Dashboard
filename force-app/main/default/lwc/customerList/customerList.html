@@ -1,4 +1,8 @@
 <template>
+    <template if:true={isLoading}>
+        <lightning-spinner alternative-text="Loading..." size="small"></lightning-spinner>
+    </template>
+    <c-customer-tile customer={cust} oncustomernavigate={handleCustomerNavigate}></c-customer-tile>
     <lightning-card title="Customer List">
         <!-- Search Input -->
         <div class="slds-p-around_medium">

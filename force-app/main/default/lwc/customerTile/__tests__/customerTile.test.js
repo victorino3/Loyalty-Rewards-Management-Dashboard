@@ -29,6 +29,7 @@ describe('c-customer-tile', () => {
 
         // Instead of accessing lightning-card.title, just check for name in shadow text
         const text = element.shadowRoot.textContent;
+        console.log('result: ',text);
         expect(text).toMatch(/Alice Smith/);
         expect(text).toMatch(/Gold/);
     });
