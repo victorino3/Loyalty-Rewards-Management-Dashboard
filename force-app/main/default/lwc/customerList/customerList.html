@@ -2,10 +2,10 @@
     <template if:true={isLoading}>
         <lightning-spinner alternative-text="Loading..." size="small"></lightning-spinner>
     </template>
-    <c-customer-tile customer={cust} oncustomernavigate={handleCustomerNavigate}></c-customer-tile>
+
     <lightning-card title="Customer List">
         <!-- Search Input -->
-        <div class="slds-p-around_medium">
+        <div class="slds-p-horizontal_small">
             <lightning-input
                 label="Search Customers"
                 type="search"
@@ -16,10 +16,11 @@
 
         <!-- Results -->
         <template if:true={customers}>
-            <div class="slds-grid slds-wrap slds-p-around_medium">
-                <template for:each={customers} for:item="cust">
-                    <div key={cust.Id} class="slds-col slds-size_1-of-2 slds-p-around_small">
-                        <c-customer-tile customer={cust}></c-customer-tile>
+            <div class="slds-grid slds-wrap slds-var-p-around_medium">
+                <template for:each={validCustomers} for:item="cust">
+                    <div key={cust.Id} class="slds-col slds-size_1-of-2 slds-var-p-around_medium">
+                        <c-customer-tile customer={cust} oncustomerselected={handleCustomerNavigate}>
+                        </c-customer-tile>
                     </div>
                 </template>
             </div>

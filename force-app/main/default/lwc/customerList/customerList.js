@@ -8,7 +8,7 @@ export default class CustomerList extends NavigationMixin(LightningElement)  {
     @track isNoResult = false;
     searchKey = '';
     delayTimeout;
-    @track isLoading = false;
+    isLoading = false;
     /* eslint-disable @lwc/lwc/no-async-operation */
     handleSearchChange(event) {
         window.clearTimeout(this.delayTimeout);
@@ -24,32 +24,60 @@ export default class CustomerList extends NavigationMixin(LightningElement)  {
         if (!this.searchKey) {
             this.customers = [];
             this.isNoResult = false;
+            this.isLoading = false; // ✅ Reset spinner
             return;
         }
+    
         this.isLoading = true;
+    
         searchCustomers({ keyword: this.searchKey })
             .then((result) => {
                 this.customers = result;
                 this.isNoResult = result.length === 0;
                 this.error = undefined;
+                this.isLoading = false; // ✅ Turn off spinner
             })
             .catch((error) => {
                 this.error = error.body?.message || 'Unknown error';
                 this.customers = [];
+            })
+            .finally(() => {
+                this.isLoading = false; // ✅ Turn off spinner
             });
     }
+    
 /* eslint-enable @lwc/lwc/no-async-operation */
     handleCustomerNavigate(event) {
-        const customerId = event.detail;
+        const customer = event.detail;
+        console.log('Customer selected:', customer);
+        console.log('Customer ID in handle:', customer.Id);
+        const customerId = customer?.Id;
+
+        if (!customerId) return;
 
         this[NavigationMixin.Navigate]({
+            /*
+            Was redirecting to the customer detail component Aura, but preferred to redirect to the costumer record page
             type: 'standard__component',
             attributes: {
                 componentName: 'c__CustomerDetailAura'
             },
             state: {
                 c__recordId: customerId
-            }
+            }*/
+            type: 'standard__recordPage',
+            attributes: {
+                    recordId: customer.Id,
+                    objectApiName: 'Customer__c', // or 'Contact'
+                    actionName: 'view'
+                }
+          
         });
     }
+
+
+    get validCustomers() {
+        return this.customers?.filter(c => c && c.Id);
+    }
+    
 }

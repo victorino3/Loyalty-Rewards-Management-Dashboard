@@ -3,4 +3,9 @@
     <apiVersion>63.0</apiVersion>
     <isExposed>true</isExposed>
     <description>A Lightning Component Bundle</description>
+    <targets>
+        <target>lightning__RecordPage</target>
+        <target>lightning__AppPage</target>
+        <target>lightning__HomePage</target>
+    </targets>
 </AuraDefinitionBundle>
