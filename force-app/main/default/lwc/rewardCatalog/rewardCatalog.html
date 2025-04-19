@@ -1,3 +1,19 @@
 <template>
-    
+    <lightning-card title="Available Rewards">
+        <template if:true={rewards}>
+            <div class="slds-grid slds-wrap slds-p-around_medium">
+                <template for:each={rewards} for:item="reward">
+                    <div key={reward.Id} class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-large-size_1-of-3 slds-p-around_small">
+                        <div class="slds-box slds-theme_default slds-box_link" onclick={handleSelect}>
+                            <p><strong>{reward.Name}</strong></p>
+                            <p>Points: {reward.Points__c}</p>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </template>
+        <template if:true={error}>
+            <p class="slds-text-color_error slds-p-around_medium">{error}</p>
+        </template>
+    </lightning-card>
 </template>

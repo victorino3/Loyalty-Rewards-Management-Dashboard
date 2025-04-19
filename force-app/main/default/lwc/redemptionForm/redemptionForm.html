@@ -1,3 +1,29 @@
 <template>
-    
+    <lightning-card title="Redeem Reward">
+        <template if:true={selectedReward}>
+            <div class="slds-p-around_medium">
+                <p><strong>Reward:</strong> {selectedReward.Name}</p>
+                <p><strong>Points Required:</strong> {selectedReward.Points__c}</p>
+
+                <lightning-input 
+                    label="Customer ID" 
+                    value={customerId}
+                    onchange={handleCustomerChange}
+                    required>
+                </lightning-input>
+
+                <lightning-button 
+                    class="slds-m-top_medium"
+                    label="Redeem"
+                    variant="brand"
+                    onclick={handleSubmit}
+                    disabled={isRedeemDisabled}>
+                </lightning-button>
+            </div>
+        </template>
+
+        <template if:false={selectedReward}>
+            <p class="slds-p-around_medium">Select a reward to redeem.</p>
+        </template>
+    </lightning-card>
 </template>
