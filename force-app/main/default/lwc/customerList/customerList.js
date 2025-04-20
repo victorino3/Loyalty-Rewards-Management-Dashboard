@@ -9,6 +9,7 @@ export default class CustomerList extends NavigationMixin(LightningElement)  {
     searchKey = '';
     delayTimeout;
     isLoading = false;
+    @track selectedReward;
     /* eslint-disable @lwc/lwc/no-async-operation */
     handleSearchChange(event) {
         window.clearTimeout(this.delayTimeout);
@@ -73,6 +74,10 @@ export default class CustomerList extends NavigationMixin(LightningElement)  {
                 }
           
         });
+    }
+
+    handleRewardSelected(event) {
+        this.selectedReward = event.detail;
     }
 
 

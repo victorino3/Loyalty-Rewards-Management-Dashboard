@@ -22,4 +22,5 @@ export default class RewardCatalog extends LightningElement {
         });
         this.dispatchEvent(event);
     }
+    
 }

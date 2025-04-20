@@ -26,6 +26,16 @@
             </div>
         </template>
 
+        <!-- Reward Section -->
+    <div class="slds-col slds-size_1-of-2 slds-var-p-around_medium">
+        <c-reward-catalog onrewardselected={handleRewardSelected}></c-reward-catalog>
+         <!-- Redemption Form -->
+    <c-redemption-form selected-reward={selectedReward}></c-redemption-form>
+
+    </div>
+ 
+   
+
         <!-- No Results -->
         <template if:true={customers}>
             <template if:true={isNoResult}>
