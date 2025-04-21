@@ -26,13 +26,15 @@
             </div>
         </template>
 
-        <!-- Reward Section -->
-    <div class="slds-col slds-size_1-of-2 slds-var-p-around_medium">
-        <c-reward-catalog onrewardselected={handleRewardSelected}></c-reward-catalog>
-         <!-- Redemption Form -->
-    <c-redemption-form selected-reward={selectedReward}></c-redemption-form>
-
-    </div>
+        <div class="slds-grid slds-wrap slds-var-p-around_medium">
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-p-around_small">
+                <c-reward-catalog onrewardselected={handleRewardSelected}></c-reward-catalog>
+            </div>
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-p-around_small">
+                <c-redemption-form selected-reward={selectedReward}></c-redemption-form>
+            </div>
+        </div>
+        
  
    
 

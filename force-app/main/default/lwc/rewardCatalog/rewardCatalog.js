@@ -15,12 +15,16 @@ export default class RewardCatalog extends LightningElement {
         }
     }
 
-    handleSelect(reward) {
-        // Emit reward to parent (e.g. RedemptionForm)
-        const event = new CustomEvent('rewardselected', {
-            detail: reward
-        });
-        this.dispatchEvent(event);
+    handleSelect(event) {
+        const rewardId = event.currentTarget.dataset.id;
+        const selected = this.rewards.find(r => r.Id === rewardId);
+        
+        if (selected) {
+            const rewardEvent = new CustomEvent('rewardselected', {
+                detail: selected
+            });
+            this.dispatchEvent(rewardEvent);
+        }
     }
     
 }

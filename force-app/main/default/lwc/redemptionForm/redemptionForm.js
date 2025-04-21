@@ -1,5 +1,5 @@
 import { LightningElement, api } from 'lwc';
-import createRedemption from '@salesforce/apex/RedemptionController.createRedemption';
+import createRedemptionBulk from '@salesforce/apex/RedemptionController.createRedemptionBulk';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 export default class RedemptionForm extends LightningElement {
@@ -11,14 +11,41 @@ export default class RedemptionForm extends LightningElement {
         this.customerId = event.target.value;
     }
 
+    buildRedemptionList() {
+        const redemption = {
+            Customer__c: this.customerId,
+            Reward__c: this.selectedReward.Id,
+            Status__c: this.selectedReward.Is_Active__c,
+            Date__c: new Date().toISOString()
+        };
+        return [redemption];
+    }
+    /**
+     * Add in future for bulk
+     * buildRedemptionList() {
+    const redemptionList = [];
+
+    const rewards = this.selectedRewards; // imagine this is an array
+    for (const reward of rewards) {
+        redemptionList.push({
+            Customer__c: this.customerId,
+            Reward__c: reward.Id,
+            Status__c: reward.Is_Active__c ? 'Active' : 'Inactive',
+            Date__c: new Date().toISOString()
+        });
+    }
+
+    return redemptionList;
+}
+     */
 
     async handleSubmit() {
         this.isSubmitting = true;
         try {
-            await createRedemption({ 
-                customerId: this.customerId, 
-                rewardId: this.selectedReward.Id 
-            });
+            const redemptionList = this.buildRedemptionList();
+            const payload = JSON.stringify(redemptionList);
+
+            await createRedemptionBulk({ redemptionsJson: payload });
 
             this.dispatchEvent(new ShowToastEvent({
                 title: 'Success',
@@ -37,6 +64,7 @@ export default class RedemptionForm extends LightningElement {
             this.isSubmitting = false;
         }
     }
+    
 
     get isRedeemDisabled() {
         return this.isSubmitting || !this.customerId;

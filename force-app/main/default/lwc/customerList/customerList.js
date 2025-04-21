@@ -50,8 +50,6 @@ export default class CustomerList extends NavigationMixin(LightningElement)  {
 /* eslint-enable @lwc/lwc/no-async-operation */
     handleCustomerNavigate(event) {
         const customer = event.detail;
-        console.log('Customer selected:', customer);
-        console.log('Customer ID in handle:', customer.Id);
         const customerId = customer?.Id;
 
         if (!customerId) return;
@@ -78,6 +76,7 @@ export default class CustomerList extends NavigationMixin(LightningElement)  {
 
     handleRewardSelected(event) {
         this.selectedReward = event.detail;
+        
     }
 
 
