@@ -2,9 +2,11 @@ public with sharing class RedemptionTriggerHandler {
 
 
     public static void handleAfterInsert(List<Redemption__c> newRedemptions) {
+        system.debug('RedemptionTriggerHandler.handleAfterInsert() - Start');
+        system.debug('RedemptionTriggerHandler.handleAfterInsert() - newRedemptions: ' + newRedemptions);
         Set<Id> customerIds = new Set<Id>();
         Set<Id> rewardIs = new Set<Id>();
-        Map<Id, Integer> pointsToDeduct = new Map<Id, Integer>();
+        Map<Id, Decimal> pointsToDeduct = new Map<Id, Decimal>();
 
         for (Redemption__c red : newRedemptions) {
             if (red.Customer__c != null && red.Reward__c != null) {
@@ -13,11 +15,10 @@ public with sharing class RedemptionTriggerHandler {
             rewardIs.add(red.Reward__c);
         }
 
-        // Query related Rewards
         Map<Id, Reward__c> rewardMap = new Map<Id, Reward__c>(
             [SELECT Id, Points_Cost__c FROM Reward__c WHERE Id IN :rewardIs]
         );
-        // Calculate total points to deduct per customer
+
         for (Redemption__c red : newRedemptions) {
             if (rewardMap.containsKey(red.Reward__c)) {
                 Decimal cost = rewardMap.get(red.Reward__c).Points_Cost__c;
@@ -25,14 +26,13 @@ public with sharing class RedemptionTriggerHandler {
             }
         }
 
-        // Query customers and update
         if (Schema.sObjectType.Customer__c.isAccessible()) {
             List<Customer__c> customersToUpdate = [
                 SELECT Id, Points_Balance__c, Tier__c FROM Customer__c WHERE Id IN :customerIds
             ];
 
             for (Customer__c cust : customersToUpdate) {
-                Integer toDeduct = pointsToDeduct.get(cust.Id);
+                Decimal toDeduct = pointsToDeduct.get(cust.Id);
                 cust.Points_Balance__c = Math.max(0, cust.Points_Balance__c - toDeduct);
                 cust.Tier__c = LoyaltyUtils.getTierForPoints(cust.Points_Balance__c);
             }
