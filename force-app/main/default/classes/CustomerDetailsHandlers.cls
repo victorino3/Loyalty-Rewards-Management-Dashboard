@@ -7,6 +7,7 @@ public with sharing class CustomerDetailsHandlers {
                 customer.Tier__c = 'Bronze';
             }
         }
+
     }
     
     public static void sendEmailToCustomer(List<Customer__c> customers) {
@@ -20,4 +21,31 @@ public with sharing class CustomerDetailsHandlers {
         }
         Messaging.sendEmail(emails);
     }
+
+    public static void updateTierLevel(Map<Id, Customer__c> newMap, Map<Id, Customer__c> oldMap) {
+        List<Customer__c> customersToUpdate = new List<Customer__c>();
+    
+        for (Id custId : newMap.keySet()) {
+            Customer__c newCustomer = newMap.get(custId);
+            Customer__c oldCustomer = oldMap.get(custId);
+    
+            if (newCustomer.Points_Balance__c != oldCustomer.Points_Balance__c) {
+                Customer__c updated = new Customer__c(
+                    Id = custId,
+                    Tier__c = LoyaltyUtils.getTierForPoints(newCustomer.Points_Balance__c)
+                );
+                customersToUpdate.add(updated);
+            }
+        }
+    
+        if (!customersToUpdate.isEmpty()) {
+            if (Schema.sObjectType.Customer__c.isUpdateable()) {
+                update customersToUpdate;
+            } else {
+                throw new System.SecurityException('Insufficient permissions to update Customer records.');
+            }
+        }
+    }
+    
+    
 }

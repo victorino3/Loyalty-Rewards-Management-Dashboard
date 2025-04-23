@@ -1,4 +1,4 @@
-import { LightningElement, api, wire } from 'lwc';
+import { LightningElement, api } from 'lwc';
 import createRedemptionBulk from '@salesforce/apex/RedemptionController.createRedemptionBulk';
 import getCustomerName from '@salesforce/apex/RedemptionController.getCustomerName';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
@@ -11,16 +11,22 @@ export default class RedemptionForm extends LightningElement {
     customerName;
     customerError;
 
-    @wire(getCustomerName, { customerId: '$customerId' })
-    wiredCustomerName({ error, data }) {
-        if (data) {
-            this.customerName = data;
-        } else if (error) {
-            this.customerError = error;
-        }
-    }
     handleCustomerChange(event) {
         this.customerId = event.target.value;
+    
+        if (this.customerId) {
+            getCustomerName({ customerId: this.customerId })
+                .then(result => {
+                    this.customerName = result;
+                    this.customerError = null;
+                    console.log('Customer name:', result);
+                })
+                .catch(error => {
+                    this.customerError = error;
+                    this.customerName = null;
+                    console.error('Error fetching name:', error);
+                });
+        }
     }
     //Update the status after to some TriggerFlow to make it more dynamic
     buildRedemptionList() {
