@@ -8,8 +8,17 @@ export default class RedemptionForm extends LightningElement {
     @api selectedReward;
     customerId = '';
     isSubmitting = false;
-    @wire(getCustomerName, { customerId: '$customerId' })
     customerName;
+    customerError;
+
+    @wire(getCustomerName, { customerId: '$customerId' })
+    wiredCustomerName({ error, data }) {
+        if (data) {
+            this.customerName = data;
+        } else if (error) {
+            this.customerError = error;
+        }
+    }
     handleCustomerChange(event) {
         this.customerId = event.target.value;
     }
