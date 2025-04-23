@@ -1,5 +1,6 @@
-import { LightningElement, api } from 'lwc';
+import { LightningElement, api, wire } from 'lwc';
 import createRedemptionBulk from '@salesforce/apex/RedemptionController.createRedemptionBulk';
+import getCustomerName from '@salesforce/apex/RedemptionController.getCustomerName';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import validateRewardRedemption from '@salesforce/apex/RewardEligibilityController.validateRewardRedemption';
 
@@ -7,17 +8,19 @@ export default class RedemptionForm extends LightningElement {
     @api selectedReward;
     customerId = '';
     isSubmitting = false;
-
+    @wire(getCustomerName, { customerId: '$customerId' })
+    customerName;
     handleCustomerChange(event) {
         this.customerId = event.target.value;
     }
-
+    //Update the status after to some TriggerFlow to make it more dynamic
     buildRedemptionList() {
         const redemption = {
             Customer__c: this.customerId,
             Reward__c: this.selectedReward.Id,
-            Status__c: this.selectedReward.Is_Active__c,
-            Date__c: new Date().toISOString().split('T')[0]
+            Status__c: 'Redeemed',
+            Date__c: new Date().toISOString().split('T')[0],
+            Points_Used__c: this.selectedReward.Points_Required__c,
         };
         return [redemption];
     }
@@ -66,7 +69,7 @@ export default class RedemptionForm extends LightningElement {
     
             this.dispatchEvent(new ShowToastEvent({
                 title: 'Success',
-                message: `Redemption created for ${this.selectedReward.Name}`,
+                message: `Redemption created for ${this.selectedReward.Name} to ${this.customerName}`,
                 variant: 'success'
             }));
     

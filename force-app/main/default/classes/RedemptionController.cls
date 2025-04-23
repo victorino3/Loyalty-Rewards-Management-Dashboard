@@ -13,4 +13,12 @@ public with sharing class RedemptionController {
 
         insert redemptions;
     }
+
+    @AuraEnabled
+    public static String getCustomerName(String customerId) {
+        if (!Schema.sObjectType.Customer__c.fields.Name.isAccessible()) {
+            throw new AuraHandledException('You do not have permission to access Customer Name.');
+        }
+        return [SELECT Name FROM Customer__c WHERE Id = :customerId LIMIT 1].Name;
+    }
 }
