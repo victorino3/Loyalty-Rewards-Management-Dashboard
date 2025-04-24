@@ -4,17 +4,33 @@
     <template if:true={isMuleSoftMode}>
         <lightning-combobox label="Action" value={muleAction} options={muleOptions} onchange={handleMuleActionChange}></lightning-combobox>
         
+        <lightning-button
+            label="Retrieve Data"
+            onclick={handleRetrieveData}
+            class="slds-m-top_small"
+            disabled={isRetrieveDisabled}>
+        </lightning-button>
+
         <template if:true={rewards.length}>
-            <p>Fetched {rewards.length} Rewards</p>
+            <p class="slds-m-top_small">✅ {rewards.length} Rewards fetched</p>
+            <template for:each={rewards} for:item="reward">
+                <c-reward-catalog key={reward.Id} reward={reward}></c-reward-catalog>
         </template>
 
         <template if:true={customers.length}>
-            <p>Fetched {customers.length} Customers</p>
+            <p class="slds-m-top_small">✅ {customers.length} Customers fetched</p>
+
+            <template for:each={customers} for:item="cust">
+                <c-customer-tile key={cust.Id} customer={cust}></c-customer-tile>
         </template>
     </template>
 
     <template if:true={isFormMode}>
         <lightning-button label="View Rewards" onclick={handleViewRewards}></lightning-button>
         <lightning-button label="View Customers" onclick={handleViewCustomers}></lightning-button>
+         <!-- AdminRewardCreator component -->
+         <div class="slds-m-top_large">
+            <c-admin-reward-creator></c-admin-reward-creator>
+        </div>
     </template>
 </template>
