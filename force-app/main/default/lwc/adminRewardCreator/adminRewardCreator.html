@@ -1,3 +1,20 @@
 <template>
-    
+    <lightning-combobox label="Data Source" value={mode} options={modeOptions} onchange={handleModeChange}></lightning-combobox>
+
+    <template if:true={isMuleSoftMode}>
+        <lightning-combobox label="Action" value={muleAction} options={muleOptions} onchange={handleMuleActionChange}></lightning-combobox>
+        
+        <template if:true={rewards.length}>
+            <p>Fetched {rewards.length} Rewards</p>
+        </template>
+
+        <template if:true={customers.length}>
+            <p>Fetched {customers.length} Customers</p>
+        </template>
+    </template>
+
+    <template if:true={isFormMode}>
+        <lightning-button label="View Rewards" onclick={handleViewRewards}></lightning-button>
+        <lightning-button label="View Customers" onclick={handleViewCustomers}></lightning-button>
+    </template>
 </template>
