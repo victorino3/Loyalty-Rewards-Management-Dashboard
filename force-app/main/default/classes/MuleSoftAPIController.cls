@@ -32,4 +32,9 @@ public with sharing class MuleSoftAPIController {
             throw new AuraHandledException('Error: ' + res.getBody());
         }
     }
+
+    @AuraEnabled
+    public static void enqueueMuleSoftInsert(String objectName, String responseBody) {
+        System.enqueueJob(new MuleSoftIntegrationHandlerQueueable(objectName, responseBody));
+    }
 }

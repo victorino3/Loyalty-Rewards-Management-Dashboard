@@ -1,30 +1,16 @@
-
-import { LightningElement, wire } from 'lwc';
-import getAvailableRewards from '@salesforce/apex/RewardController.getAvailableRewards';
+import { LightningElement, api } from 'lwc';
 
 export default class RewardCatalog extends LightningElement {
-    rewards;
+    @api reward; 
     error;
-
-    @wire(getAvailableRewards)
-    wiredRewards({ data, error }) {
-        if (data) {
-            this.rewards = data;
-        } else if (error) {
-            this.error = error.body.message;
-        }
-    }
 
     handleSelect(event) {
         const rewardId = event.currentTarget.dataset.id;
-        const selected = this.rewards.find(r => r.Id === rewardId);
-        
-        if (selected) {
+        if (this.reward.Id === rewardId) { 
             const rewardEvent = new CustomEvent('rewardselected', {
-                detail: selected
+                detail: this.reward
             });
             this.dispatchEvent(rewardEvent);
         }
     }
-    
 }

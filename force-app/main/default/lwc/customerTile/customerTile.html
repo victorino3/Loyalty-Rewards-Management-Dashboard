@@ -1,13 +1,11 @@
 <template>
     <template if:true={customer}>
-        <lightning-card>
             <div class="slds-box slds-theme_default slds-box_link" onclick={handleClick}>
                 <p><strong>Name:</strong> {customer.Name}</p>
                 <p><strong>Email:</strong> {customer.Email__c}</p>
                 <p><strong>Points:</strong> {customer.Points_Balance__c}</p>
                 <p><strong>Tier:</strong> {customer.Tier__c}</p>
             </div>
-        </lightning-card>
     </template>
     <template if:false={customer}>
         <div class="slds-box slds-text-color_error">

@@ -1,36 +1,69 @@
 <template>
-    <lightning-combobox label="Data Source" value={mode} options={modeOptions} onchange={handleModeChange}></lightning-combobox>
+    <lightning-combobox
+        label="Data Source"
+        value={mode}
+        options={modeOptions}
+        onchange={handleModeChange}>
+    </lightning-combobox>
 
     <template if:true={isMuleSoftMode}>
-        <lightning-combobox label="Action" value={muleAction} options={muleOptions} onchange={handleMuleActionChange}></lightning-combobox>
-        
+        <lightning-combobox
+            label="Action"
+            value={muleAction}
+            options={muleOptions}
+            onchange={handleMuleActionChange}>
+        </lightning-combobox>
+
         <lightning-button
             label="Retrieve Data"
             onclick={handleRetrieveData}
             class="slds-m-top_small"
             disabled={isRetrieveDisabled}>
         </lightning-button>
-
-        <template if:true={rewards.length}>
-            <p class="slds-m-top_small">✅ {rewards.length} Rewards fetched</p>
-            <template for:each={rewards} for:item="reward">
-                <c-reward-catalog key={reward.Id} reward={reward}></c-reward-catalog>
+        <!-- New Save button -->
+        <template if:true={showSaveButton}>
+                    <lightning-button
+                        label="Save Data"
+                        onclick={handleSaveData}
+                        class="slds-m-top_small slds-m-left_small"
+                        variant="brand">
+                    </lightning-button>
         </template>
+        
+        <template if:true={hasRewards}>
+            <p class="slds-m-top_small">✅ {rewards.length} Rewards fetched</p>
+            <lightning-card title="Reward Catalog">
+                <template for:each={rewards} for:item="reward">
+                    <c-reward-catalog key={reward.Id} reward={reward}></c-reward-catalog> 
+                </template>
+            </lightning-card>
+        </template>
+        
 
-        <template if:true={customers.length}>
+        <template if:true={hasCustomers}>
             <p class="slds-m-top_small">✅ {customers.length} Customers fetched</p>
-
-            <template for:each={customers} for:item="cust">
-                <c-customer-tile key={cust.Id} customer={cust}></c-customer-tile>
+            <lightning-card title="Customers Records">
+                <template for:each={customers} for:item="cust">
+                    <c-customer-tile key={cust.Id} customer={cust}></c-customer-tile>
+                </template>
+            </lightning-card>
         </template>
     </template>
 
     <template if:true={isFormMode}>
-        <lightning-button label="View Rewards" onclick={handleViewRewards}></lightning-button>
-        <lightning-button label="View Customers" onclick={handleViewCustomers}></lightning-button>
-         <!-- AdminRewardCreator component -->
-         <div class="slds-m-top_large">
-            <c-admin-reward-creator></c-admin-reward-creator>
+        <lightning-button
+            label="View Rewards"
+            onclick={handleViewRewards}
+            class="slds-m-right_small">
+        </lightning-button>
+
+        <lightning-button
+            label="View Customers"
+            onclick={handleViewCustomers}>
+        </lightning-button>
+
+       <div class="slds-m-top_large">
+            <c-admin-Panel-Reward></c-admin-Panel-Reward>
         </div>
     </template>
 </template>

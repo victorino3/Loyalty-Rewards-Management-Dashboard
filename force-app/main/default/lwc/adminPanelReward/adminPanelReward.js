@@ -1,14 +1,14 @@
-import { LightningElement, track } from 'lwc';
+import { LightningElement } from 'lwc';
 import createReward from '@salesforce/apex/RewardAdminController.createReward';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 export default class AdminRewardCreator extends LightningElement {
-    @track rewardName = '';
-    @track pointsCost = null;
-    @track pointsRequired = null;
-    @track expiryDate = '';
-    @track isActive = false;
-    @track isSubmitting = false;
+    rewardName = '';
+    pointsCost = null;
+    pointsRequired = null;
+    expiryDate = '';
+    isActive = false;
+    isSubmitting = false;
 
     handleNameChange(event) {
         this.rewardName = event.target.value;
