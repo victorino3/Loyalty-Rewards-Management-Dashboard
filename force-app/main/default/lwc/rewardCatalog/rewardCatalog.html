@@ -1,18 +1,19 @@
 <template>
-    <template if:true={reward}>
+    <template if:true={rewards}>
         <div class="slds-grid slds-wrap slds-p-around_x-small">
-            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-p-around_x-small">
-                <div class="slds-box slds-box_link slds-theme_default custom-box" onclick={handleSelect} data-id={reward.Id}>
-                    <p><strong>{reward.Name}</strong></p>
-                    <p>Points Required: {reward.Points_Required__c}</p>
-                    <p>Status: {reward.Is_Active__c}</p>
-                    <p>Partner: {reward.Partner__c}</p>
-                    <p>Description: {reward.Description__c}</p>
+            <template for:each={rewards} for:item="rwd">
+                <div key={rwd.Id} class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-p-around_x-small">
+                    <div class="slds-box slds-box_link slds-theme_default custom-box" onclick={handleSelect} data-id={rwd.Id}>
+                        <p><strong>{rwd.Name}</strong></p>
+                        <p>Points Required: {rwd.Points_Required__c}</p>
+                        <p>Status: {rwd.Is_Active__c}</p>
+                        <p>Partner: {rwd.Partner__c}</p>
+                        <p>Description: {rwd.Description__c}</p>
+                    </div>
                 </div>
-            </div>
+            </template>
         </div>
     </template>
-    
 
     <template if:true={error}>
         <p class="slds-text-color_error slds-p-around_medium">{error}</p>

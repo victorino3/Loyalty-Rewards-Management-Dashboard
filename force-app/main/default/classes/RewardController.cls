@@ -5,7 +5,7 @@ public with sharing class RewardController {
         if (!Schema.sObjectType.Reward__c.isAccessible()) {
             throw new AuraHandledException('You do not have permission to access Reward records.');
         }
-        List<Reward__c> rewards = [SELECT Id, Name, Points_Required__c, Description__c, Expiry_Date__c, Points_Cost__c, Is_Active__c
+        List<Reward__c> rewards = [SELECT Id, Name, Points_Required__c, Description__c, Expiry_Date__c, Points_Cost__c, Is_Active__c,Partner__c
                                    FROM Reward__c 
                                    WHERE Is_Active__c = TRUE 
                                    ORDER BY CreatedDate DESC];
@@ -19,9 +19,9 @@ public with sharing class RewardController {
             safe.Expiry_Date__c = r.Expiry_Date__c;
             safe.Points_Cost__c = r.Points_Cost__c;
             safe.Is_Active__c = r.Is_Active__c;
+            safe.Partner__c = r.Partner__c;
             safeRewards.add(safe);
         }
-
         return safeRewards;
     }
 }
