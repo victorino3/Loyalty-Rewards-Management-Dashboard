@@ -9,6 +9,8 @@ export default class AdminRewardCreator extends LightningElement {
     expiryDate = '';
     isActive = false;
     isSubmitting = false;
+    partner = '';
+    description = '';
 
     handleNameChange(event) {
         this.rewardName = event.target.value;
@@ -30,6 +32,15 @@ export default class AdminRewardCreator extends LightningElement {
         this.isActive = event.target.checked;
     }
 
+    handlePartnerChange(event) {
+        this.partner = event.target.value;
+    }
+
+    handleDescriptionChange(event) {
+        this.description = event.target.value;
+    }
+
+
     async handleSubmit() {
         this.isSubmitting = true;
 
@@ -39,7 +50,9 @@ export default class AdminRewardCreator extends LightningElement {
                 Points_Cost__c: this.pointsCost,
                 Points_Required__c: this.pointsRequired,
                 Expiry_Date__c: this.expiryDate,
-                Is_Active__c: this.isActive
+                Is_Active__c: this.isActive,
+                Partner__c: this.partner,
+                Description__c: this.description
             };
 
             await createReward({ rewardData: payload });

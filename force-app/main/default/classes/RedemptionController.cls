@@ -15,10 +15,10 @@ public with sharing class RedemptionController {
     }
 
     @AuraEnabled
-    public static String getCustomerName(String customerId) {
+    public static List<Customer__c> getCustomerName(String customerEmail) {
         if (!Schema.sObjectType.Customer__c.fields.Name.isAccessible()) {
             throw new AuraHandledException('You do not have permission to access Customer Name.');
         }
-        return [SELECT Name FROM Customer__c WHERE Id = :customerId LIMIT 1].Name;
+        return [SELECT Name FROM Customer__c WHERE Email__c = :customerEmail LIMIT 1];
     }
 }

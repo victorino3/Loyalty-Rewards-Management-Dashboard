@@ -6,8 +6,10 @@
                 <p><strong>Points Required:</strong> {selectedReward.Points_Required__c}</p>
 
                 <lightning-input 
-                    label="Customer ID" 
-                    value={customerId}
+                    label="Customer Email"
+                    type="email" 
+                    value={customerEmail}
+                    placeholder="Enter customer email"
                     onchange={handleCustomerChange}
                     required>
                 </lightning-input>

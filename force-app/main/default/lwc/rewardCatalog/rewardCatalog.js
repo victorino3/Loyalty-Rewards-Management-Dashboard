@@ -19,7 +19,6 @@ export default class RewardCatalog extends LightningElement {
         getAvailableRewards()
             .then(result => {
                 this.rewards = result;
-                console.log('Reward passed:', result);
             })
             .catch(error => {
                 this.error = error;

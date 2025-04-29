@@ -7,6 +7,8 @@ public with sharing class RewardAdminController {
         reward.Points_Required__c = (Decimal) rewardData.get('Points_Required__c');
         reward.Expiry_Date__c = Date.valueOf((String) rewardData.get('Expiry_Date__c'));
         reward.Is_Active__c = (Boolean) rewardData.get('Is_Active__c');
+        reward.Partner__c = (String) rewardData.get('Partner__c');
+        reward.Description__c = (String) rewardData.get('Description__c');
     
         if (Schema.sObjectType.Reward__c.isCreateable()) {
             insert reward;

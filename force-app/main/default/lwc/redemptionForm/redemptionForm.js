@@ -6,20 +6,24 @@ import validateRewardRedemption from '@salesforce/apex/RewardEligibilityControll
 
 export default class RedemptionForm extends LightningElement {
     @api selectedReward;
-    customerId = '';
+    customerEmail = '';
     isSubmitting = false;
     customerName;
+    customerId = '';
     customerError;
 
     handleCustomerChange(event) {
-        this.customerId = event.target.value;
-    
-        if (this.customerId) {
-            getCustomerName({ customerId: this.customerId })
+        this.customerEmail = event.target.value;
+        console.log('Customer email:', this.customerEmail);
+        if (this.customerEmail) {
+            getCustomerName({ customerId: this.customerEmail })
                 .then(result => {
-                    this.customerName = result;
-                    this.customerError = null;
                     console.log('Customer name:', result);
+                    this.customerName = result.name;
+                    this.customerId = result.id;
+                    this.customerError = null;
+                    console.log('Customer name:', this.customerName);
+                    
                 })
                 .catch(error => {
                     this.customerError = error;
@@ -31,8 +35,10 @@ export default class RedemptionForm extends LightningElement {
     //Update the status after to some TriggerFlow to make it more dynamic
     buildRedemptionList() {
         const redemption = {
+            name: `Redemption for ${this.selectedReward.Name}`,
             Customer__c: this.customerId,
             Reward__c: this.selectedReward.Id,
+            Partner__c: this.selectedReward.Partner__c,
             Status__c: 'Redeemed',
             Date__c: new Date().toISOString().split('T')[0],
             Points_Used__c: this.selectedReward.Points_Required__c,
@@ -91,7 +97,7 @@ export default class RedemptionForm extends LightningElement {
             this.customerId = '';
         } catch (error) {
             this.dispatchEvent(new ShowToastEvent({
-                title: 'Error creating redemption',
+                title: 'Error creating redemption contact the Admin',
                 message: error.body?.message || 'Unknown error',
                 variant: 'error'
             }));
@@ -103,6 +109,6 @@ export default class RedemptionForm extends LightningElement {
     
 
     get isRedeemDisabled() {
-        return this.isSubmitting || !this.customerId;
+        return this.isSubmitting || !this.customerEmail;
     }
 }
