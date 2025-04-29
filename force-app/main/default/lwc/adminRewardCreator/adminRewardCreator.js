@@ -56,7 +56,7 @@ export default class AdminPanel extends NavigationMixin(LightningElement) {
             .catch(error => {
                 this.rewards = [];
                 this.showSaveButton = false;
-                this.showToast('Error', 'Failed to fetch rewards.', 'error');
+                this.showToast('Error', 'Failed to fetch rewards Contact the Admin.', 'error');
                 console.error(error);
             });
     }
@@ -65,14 +65,14 @@ export default class AdminPanel extends NavigationMixin(LightningElement) {
         fetchCustomersFromMuleSoft()
             .then(result => {
                 this.customers = result;
-                this.rewards = []; // clear reward if switching
-                this.showSaveButton = true; // <== ENABLE Save
+                this.rewards = []; 
+                this.showSaveButton = true;     
                 this.showToast('Success', 'Customers fetched successfully!', 'success');
             })
             .catch(error => {
                 this.customers = [];
                 this.showSaveButton = false;
-                this.showToast('Error', 'Failed to fetch customers.', 'error');
+                this.showToast('Error', 'Failed to fetch customers Contact the Admin.', 'error');
                 console.error(error);
             });
     }
@@ -87,7 +87,7 @@ export default class AdminPanel extends NavigationMixin(LightningElement) {
                 this.showSaveButton = false; // Optionally hide Save after enqueuing
             })
             .catch(error => {
-                this.showToast('Error', 'Failed to enqueue insert.', 'error');
+                this.showToast('Error', 'Failed to enqueue insert Contact the Admin.', 'error');
                 console.error(error);
             });
     }
