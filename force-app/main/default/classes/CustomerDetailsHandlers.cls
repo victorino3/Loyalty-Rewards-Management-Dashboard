@@ -19,7 +19,16 @@ public with sharing class CustomerDetailsHandlers {
             email.setPlainTextBody('Dear ' + customer.Name + ',\n\nThank you for joining our loyalty program. Your current tier level is: ' + customer.Tier__c + '.\n\nBest regards,\nLoyalty Team');
             emails.add(email);
         }
-        Messaging.sendEmail(emails);
+        if(EmailLimitChecker.checkEmailLimits()) {
+            Messaging.sendEmail(emails);
+            System.debug('Emails sent successfully.'); // Log the success in object possible improvement
+            return;
+        }else {
+            System.debug('Email limit exceeded! Emails not sent.'); // Log the failure in object possible improvement
+            // Optionally, you can throw an exception or handle the error as needed
+            return ;
+        }
+        
     }
 
     public static void updateTierLevel(Map<Id, Customer__c> newMap, Map<Id, Customer__c> oldMap) {

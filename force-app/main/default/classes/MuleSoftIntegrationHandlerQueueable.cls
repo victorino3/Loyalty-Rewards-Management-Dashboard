@@ -44,8 +44,10 @@ public with sharing class MuleSoftIntegrationHandlerQueueable implements Queueab
                         reward.Description__c = (String) recordMap.get('Description__c');
                         reward.Points_Required__c = recordMap.containsKey('Points_Required__c') ?
                             Integer.valueOf(String.valueOf(recordMap.get('Points_Required__c'))) : 0;
+                        reward.Points_Cost__c = recordMap.containsKey('Points_Required__c') ?
+                            Integer.valueOf(String.valueOf(recordMap.get('Points_Required__c'))) : 0;
                         reward.Partner__c = (String) recordMap.get('Partner__c');
-                        //add expriration date if present or if not add date 30 days from now using operator
+                        //add expiration date if present or if not add date 30 days from now using operator
                         if (recordMap.containsKey('Expiry_Date__c')) {
                             reward.Expiry_Date__c = Date.valueOf((String) recordMap.get('Expiry_Date__c'));
                         } else {
