@@ -1,0 +1,290 @@
+#%RAML 1.0
+title: DevRel-Quick Start Rewards API
+version: v1.0
+description: API for managing customers, rewards, and point transactions within the DevRel Quick Start program.
+
+# Define Security Scheme
+securitySchemes:
+  basic:
+    description: |
+      This API supports Basic Authentication using username and password.
+    type: Basic Authentication
+
+# Apply Security Scheme Globally
+securedBy: [basic]
+
+# Define Data Types
+types:
+  # --- Existing Types (Kept for context/potential use) ---
+  customer:
+    description: Represents a customer in the rewards program.
+    properties:
+      id:
+        type: string
+        description: Unique identifier for the customer.
+        required: true
+      name:
+        type: string
+        description: Full name of the customer.
+        required: true
+      Email__c:
+        type: string
+        description: Email address of the customer (Salesforce custom field format).
+        required: true
+      Points_Balance__c:
+        type: number
+        description: Current points balance of the customer.
+        required: false
+      Tier__c:
+        type: string
+        description: Current rewards tier of the customer (e.g., Bronze, Silver, Gold).
+        required: false
+
+  reward:
+    description: Represents a reward available in the catalog.
+    properties:
+      id:
+        type: string
+        description: Unique identifier for the reward.
+        required: true
+      name:
+        type: string
+        description: Name of the reward.
+        required: true
+      Description__c:
+        type: string
+        description: Description of the reward (Salesforce custom field format).
+        required: false
+      Points_Required__c:
+        type: number
+        format: int64
+        description: Number of points required to redeem the reward.
+        required: true
+      Partner__c:
+        type: string
+        description: Name or ID of the partner providing the reward.
+        required: false
+      Is_Active__c:
+        type: boolean
+        description: Indicates if the reward is currently active and available.
+        required: true
+
+  # --- Types for New Endpoints ---
+  transactionPayload:
+    description: Payload structure for recording transactions or point updates (used for both request and response).
+    properties:
+      partner:
+        type: string
+        description: Name or identifier of the partner associated with the transaction.
+        required: true
+        example: "PROZIS"
+      product:
+        type: string
+        description: Name or identifier of the product involved.
+        required: true
+        example: "Whey Protein Concentrate 1kg"
+      price:
+        type: number
+        format: double
+        description: The monetary value of the transaction.
+        required: true
+        example: 29.99
+      date:
+        type: datetime
+        format: rfc3339
+        description: Timestamp when the transaction occurred or was processed.
+        required: true
+        example: "2025-04-29T16:10:00Z"
+      points:
+        type: number
+        format: int64
+        description: The number of points earned or adjusted in this transaction.
+        required: true
+        example: 30
+      # Optional: Add server-generated fields to the response if needed
+      # transactionId:
+      #   type: string
+      #   description: Unique identifier assigned to the processed transaction.
+      #   required: false # Only present in response
+
+  # Redundant if not used elsewhere, kept for potential future use
+  # successResponse:
+  #   description: Standard response structure for successful simple operations.
+  #   properties:
+  #     message:
+  #       type: string
+  #       description: Confirmation message indicating success.
+  #       required: true
+  #     transactionId:
+  #       type: string
+  #       description: Unique identifier for the processed transaction.
+  #       required: false
+
+  errorResponse:
+    description: Structure for standard error responses.
+    properties:
+      message:
+        type: string
+        description: A message describing the error.
+        required: true
+
+# Define Resources
+/customers:
+  description: Operations related to customers.
+  get:
+    description: Retrieve a list of all customers.
+    responses:
+      200:
+        description: A list of customers retrieved successfully.
+        body:
+          application/json:
+            type: customer[]
+            example: !include examples/customers-example.json
+      401:
+        description: Unauthorized, authentication credentials missing or invalid.
+        body:
+          application/json:
+            type: errorResponse
+            example: |
+              { "message": "Unauthorized: Valid credentials required." }
+
+/rewards:
+  description: Operations related to rewards.
+  get:
+    description: Retrieve a list of available rewards.
+    responses:
+      200:
+        description: A list of rewards retrieved successfully.
+        body:
+          application/json:
+            type: reward[]
+            example: !include examples/rewards-example.json
+      401:
+        description: Unauthorized, authentication credentials missing or invalid.
+        body:
+          application/json:
+            type: errorResponse
+            example: |
+              { "message": "Unauthorized: Valid credentials required." }
+
+# --- New Endpoints ---
+
+/ecommerceBuy:
+  description: |
+    Records a purchase made through an e-commerce channel.
+    Returns the recorded transaction details upon success.
+    Assumes the customer context is derived from the authenticated user or other means.
+  post:
+    description: Submit details of an e-commerce purchase.
+    body:
+      application/json:
+        type: transactionPayload
+        example: |
+          {
+            "partner": "ZUMUB",
+            "product": "Creatine Monohydrate 500g",
+            "price": 19.95,
+            "date": "2025-04-29T16:18:00Z",
+            "points": 20
+          }
+    responses:
+      201: # Use 201 Created for successful resource creation/recording
+        description: Purchase recorded successfully. Returns the recorded details.
+        body:
+          application/json:
+            # *** CHANGED HERE: Response type is now transactionPayload ***
+            type: transactionPayload
+            # *** Example now reflects the transactionPayload structure ***
+            example: |
+              {
+                "partner": "ZUMUB",
+                "product": "Creatine Monohydrate 500g",
+                "price": 19.95,
+                "date": "2025-04-29T16:18:00Z",
+                "points": 20
+              }
+      400:
+        description: Bad request, invalid data provided in the payload.
+        body:
+          application/json:
+            type: errorResponse
+            example: |
+              { "message": "Bad Request: Missing required field 'price'." }
+      401:
+        description: Unauthorized, authentication credentials missing or invalid.
+        body:
+          application/json:
+            type: errorResponse
+            example: |
+              { "message": "Unauthorized: Valid credentials required." }
+      500:
+        description: Internal server error occurred while processing the purchase.
+        body:
+          application/json:
+            type: errorResponse
+            example: |
+              { "message": "Internal Server Error: Failed to record purchase." }
+
+/pointsUpdate:
+  description: |
+    Manually updates points for a customer based on specific transaction details.
+    Returns the applied update details upon success.
+    Useful for adjustments, returns, or non-standard point events.
+    Assumes the customer context is derived from the authenticated user or specified implicitly.
+  post:
+    description: Submit details to update points balance.
+    body:
+      application/json:
+        type: transactionPayload
+        example: |
+          {
+            "partner": "Support Team",
+            "product": "Manual Adjustment - Customer Service Gesture",
+            "price": 0.00,
+            "date": "2025-04-29T16:20:00Z",
+            "points": -50
+          }
+    responses:
+      200: # Use 200 OK for successful updates
+        description: Points updated successfully. Returns the details of the update.
+        body:
+          application/json:
+            # *** CHANGED HERE: Response type is now transactionPayload ***
+            type: transactionPayload
+             # *** Example now reflects the transactionPayload structure ***
+            example: |
+              {
+                "partner": "Support Team",
+                "product": "Manual Adjustment - Customer Service Gesture",
+                "price": 0.00,
+                "date": "2025-04-29T16:20:15Z", 
+                "points": -50
+              }
+      400:
+        description: Bad request, invalid data provided in the payload.
+        body:
+          application/json:
+            type: errorResponse
+            example: |
+              { "message": "Bad Request: Invalid value for 'points'." }
+      401:
+        description: Unauthorized, authentication credentials missing or invalid.
+        body:
+          application/json:
+            type: errorResponse
+            example: |
+              { "message": "Unauthorized: Valid credentials required." }
+      404:
+        description: Customer not found (if customer identification is involved and fails).
+        body:
+          application/json:
+            type: errorResponse
+            example: |
+              { "message": "Customer context not found for points update." }
+      500:
+        description: Internal server error occurred while updating points.
+        body:
+          application/json:
+            type: errorResponse
+            example: |
+              { "message": "Internal Server Error: Failed to update points." }

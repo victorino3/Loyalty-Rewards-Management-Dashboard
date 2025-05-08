@@ -1,0 +1,192 @@
+#%RAML 1.0
+title: DevRel-Quick Start Rewards API
+version: v1.0
+description: API for managing customers and their rewards within the DevRel Quick Start program.
+
+# Define Security Scheme
+securitySchemes:
+  basic:
+    description: |
+      This API supports Basic Authentication using username and password.
+    type: Basic Authentication
+
+# Apply Security Scheme Globally
+securedBy: [basic]
+
+# Define Data Types
+types:
+  customer:
+    description: Represents a customer in the rewards program.
+    properties:
+      id:
+        type: string
+        description: Unique identifier for the customer.
+        required: true
+      name:
+        type: string
+        description: Full name of the customer.
+        required: true
+      Email__c:
+        type: string
+        description: Email address of the customer (Salesforce custom field format).
+        required: true
+      # Added properties to match the example
+      Points_Balance__c:
+        type: number
+        description: Current points balance of the customer.
+        required: false # Assuming balance might not always be present or required
+      Tier__c:
+        type: string
+        description: Current rewards tier of the customer (e.g., Bronze, Silver, Gold).
+        required: false # Assuming tier might not always be present or required
+
+  reward:
+    description: Represents a reward available in the catalog.
+    properties:
+      id:
+        type: string
+        description: Unique identifier for the reward.
+        required: true
+      name:
+        type: string
+        description: Name of the reward.
+        required: true
+      Description__c:
+        type: string
+        description: Description of the reward (Salesforce custom field format).
+        required: false
+      Points_Required__c:
+        type: number
+        format: int64 # Or int32 if appropriate
+        description: Number of points required to redeem the reward.
+        required: true
+      Partner__c:
+        type: string
+        description: Name or ID of the partner providing the reward.
+        required: false
+      Is_Active__c:
+        type: boolean
+        description: Indicates if the reward is currently active and available.
+        required: true
+
+  # Define a standard error response type
+  errorResponse:
+    description: Structure for standard error responses.
+    properties:
+      message:
+        type: string
+        description: A message describing the error.
+        required: true
+
+# Define Resources
+/customers:
+  description: Operations related to customers.
+  get:
+    description: Retrieve a list of all customers.
+    responses:
+      200:
+        description: A list of customers retrieved successfully.
+        body:
+          application/json:
+            type: customer[] # Use the defined customer type as an array
+            example: |
+              [
+                  {
+                    "id": "1",
+                    "name": "Alice Johnson",
+                    "Email__c": "alice@example.com",
+                    "Points_Balance__c": 1200,
+                    "Tier__c": "Gold"
+                  },
+                  {
+                    "id": "2",
+                    "name": "Bob Smith",
+                    "Email__c": "bob@example.com",
+                    "Points_Balance__c": 300,
+                    "Tier__c": "Bronze"
+                  },
+                  {
+                    "id": "3",
+                    "name": "Clara Lee",
+                    "Email__c": "clara@example.com",
+                    "Points_Balance__c": 2500,
+                    "Tier__c": "Platinum"
+                  },
+                  {
+                    "id": "4",
+                    "name": "David King",
+                    "Email__c": "david@example.com",
+                    "Points_Balance__c": 800,
+                    "Tier__c": "Silver"
+                  },
+                  {
+                    "id": "5",
+                    "name": "Ella Martinez",
+                    "Email__c": "ella@example.com",
+                    "Points_Balance__c": 1600,
+                    "Tier__c": "Gold"
+                  },
+                  {
+                    "id": "6",
+                    "name": "Aliceth Quimino",
+                    "Email__c": "aliceth@example.com",
+                    "Points_Balance__c": 400,
+                    "Tier__c": "Bronze"
+                  },
+                  {
+                    "id": "7",
+                    "name": "Keyla Makein",
+                    "Email__c": "Keyla@example.com",
+                    "Points_Balance__c": 2100,
+                    "Tier__c": "Platinum"
+                  }
+              ]
+      400:
+        description: Bad request, possibly due to invalid parameters.
+        body:
+          application/json:
+            type: errorResponse # Use the defined error response type
+            example: |
+              { "message": "Bad Request: Invalid query parameters provided." }
+      401:
+        description: Unauthorized, authentication credentials missing or invalid.
+        body:
+          application/json:
+            type: errorResponse
+            example: |
+              { "message": "Unauthorized: Valid credentials required." }
+
+/rewards:
+  description: Operations related to rewards.
+  get:
+    description: Retrieve a list of available rewards.
+    responses:
+      200:
+        description: A list of rewards retrieved successfully.
+        body:
+          application/json:
+            type: reward[] # Use the defined reward type as an array
+            example: |
+              [
+                { "id": "R1", "name": "10% Off Coupon", "Description__c": "Get 10% off your next order.", "Points_Required__c": 100, "Partner__c": "SHEIN", "Is_Active__c": true },
+                { "id": "R2", "name": "Free Shipping", "Description__c": "Enjoy free shipping on any purchase.", "Points_Required__c": 80, "Partner__c": "ZUMUB", "Is_Active__c": true },
+                { "id": "R3", "name": "€5 Voucher", "Description__c": "Use this voucher on your next order.", "Points_Required__c": 120, "Partner__c": "CONTINENTE", "Is_Active__c": true },
+                { "id": "R4", "name": "Protein Bar Pack", "Description__c": "A 5-pack of high protein bars.", "Points_Required__c": 150, "Partner__c": "PROZIS", "Is_Active__c": true },
+                { "id": "R5", "name": "Flight Discount", "Description__c": "€10 off on your next flight booking.", "Points_Required__c": 200, "Partner__c": "RAYANAIR", "Is_Active__c": true },
+                { "id": "R6", "name": "Gym Bag", "Description__c": "Stylish gym bag from Prozis.", "Points_Required__c": 300, "Partner__c": "PROZIS", "Is_Active__c": true },
+                { "id": "R7", "name": "Exclusive T-shirt", "Description__c": "Limited edition branded t-shirt.", "Points_Required__c": 250, "Partner__c": "ZUMUB", "Is_Active__c": true }
+              ]
+      400:
+        description: Bad request.
+        body:
+          application/json:
+            type: errorResponse # Use the defined error response type
+            example: |
+              { "message": "Bad Request" }
+      401:
+        description: Unauthorized, authentication credentials missing or invalid.
+        body:
+          application/json:
+            type: errorResponse
+            example: |
+              { "message": "Unauthorized: Valid credentials required." }
