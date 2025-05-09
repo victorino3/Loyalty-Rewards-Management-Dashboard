@@ -1,6 +1,7 @@
 import { LightningElement } from 'lwc';
 import createReward from '@salesforce/apex/RewardAdminController.createReward';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import runRewardAssignmentJobNow from '@salesforce/apex/MuleSoftAPIController.runRewardAssignmentJobNow';
 
 export default class AdminRewardCreator extends LightningElement {
     rewardName = '';
@@ -81,5 +82,16 @@ export default class AdminRewardCreator extends LightningElement {
         this.pointsRequired = null;
         this.expiryDate = '';
         this.isActive = false;
+    }
+
+    handleRunJobNow() {
+        runRewardAssignmentJobNow()
+            .then(() => {
+                this.showToast('Success', '🎯 Reward assignment job launched!', 'success');
+            })
+            .catch(error => {
+                console.error(error);
+                this.showToast('Error', '❌ Failed to start reward job.', 'error');
+            });
     }
 }

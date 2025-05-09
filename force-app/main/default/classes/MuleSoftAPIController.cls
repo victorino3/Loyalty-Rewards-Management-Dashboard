@@ -37,4 +37,9 @@ public with sharing class MuleSoftAPIController {
     public static void enqueueMuleSoftInsert(String objectName, String responseBody) {
         System.enqueueJob(new MuleSoftIntegrationHandlerQueueable(objectName, responseBody));
     }
+
+    @AuraEnabled
+    public static void runRewardAssignmentJobNow() {
+        RewardAssignmentJobHandler.executeJob();
+    }
 }
