@@ -21,11 +21,6 @@
             disabled={isRetrieveDisabled}>
         </lightning-button>
 
-        <lightning-button
-            label="Run Reward Assignment Now"
-            onclick={handleRunJobNow}
-            class="slds-m-top_small">
-        </lightning-button>
         <!-- New Save button -->
         <template if:true={showSaveButton}>
                     <lightning-button
@@ -65,7 +60,14 @@
 
         <lightning-button
             label="View Customers"
-            onclick={handleViewCustomers}>
+            onclick={handleViewCustomers}
+            class="slds-m-right_small">
+        </lightning-button>
+
+        <lightning-button
+            label="Run Reward Assignment Now"
+            onclick={handleRunJobNow}
+            class="slds-m-top_small">
         </lightning-button>
 
        <div class="slds-m-top_large">
