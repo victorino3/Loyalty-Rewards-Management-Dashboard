@@ -5,6 +5,10 @@
                 <p><strong>Reward:</strong> {selectedReward.Name}</p>
                 <p><strong>Points Required:</strong> {selectedReward.Points_Required__c}</p>
 
+                <template if:true={isLoading}>
+                    <lightning-spinner alternative-text="Loading..." size="small"></lightning-spinner>
+                </template>
+
                 <lightning-input 
                     label="Customer Email"
                     type="email" 
@@ -13,6 +17,20 @@
                     onchange={handleCustomerChange}
                     required>
                 </lightning-input>
+
+                <!-- Show customer name when found -->
+                <template if:true={customerName}>
+                    <p class="slds-m-top_small slds-text-color_success">
+                        ✅ Found customer: <strong>{customerName}</strong>
+                    </p>
+                </template>
+
+                <!-- Show error if customer not found -->
+                <template if:true={customerError}>
+                    <p class="slds-m-top_small slds-text-color_error">
+                        ❌ Could not find a customer with this email.
+                    </p>
+                </template>
 
                 <lightning-button 
                     class="slds-m-top_medium"

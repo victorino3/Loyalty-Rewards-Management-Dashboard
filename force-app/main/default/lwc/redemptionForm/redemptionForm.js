@@ -1,4 +1,4 @@
-import { LightningElement, api } from 'lwc';
+import { LightningElement, api, track } from 'lwc';
 import createRedemptionBulk from '@salesforce/apex/RedemptionController.createRedemptionBulk';
 import getCustomerName from '@salesforce/apex/RedemptionController.getCustomerName';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
@@ -6,32 +6,47 @@ import validateRewardRedemption from '@salesforce/apex/RewardEligibilityControll
 
 export default class RedemptionForm extends LightningElement {
     @api selectedReward;
-    customerEmail = '';
     isSubmitting = false;
+    customerEmail = '';
     customerName;
-    customerId = '';
+    customerId;
     customerError;
+    @track isLoading = false;
+    searchTimeout;
 
+    debounceTimeout;
+     // eslint-disable-next-line @lwc/lwc/no-async-operation
     handleCustomerChange(event) {
         this.customerEmail = event.target.value;
-        console.log('Customer email:', this.customerEmail);
-        if (this.customerEmail) {
-            getCustomerName({ customerId: this.customerEmail })
-                .then(result => {
-                    console.log('Customer name:', result);
-                    this.customerName = result.name;
-                    this.customerId = result.id;
-                    this.customerError = null;
-                    console.log('Customer name:', this.customerName);
-                    
-                })
-                .catch(error => {
-                    this.customerError = error;
-                    this.customerName = null;
-                    console.error('Error fetching name:', error);
-                });
-        }
+        // Debounce the actual Apex call
+        clearTimeout(this.searchTimeout);
+        // eslint-disable-next-line @lwc/lwc/no-async-operation
+        this.searchTimeout = setTimeout(() => {
+            this.searchCustomer();
+        }, 700);
     }
+
+     searchCustomer() {
+        if (!this.customerEmail) return;
+
+        this.isLoading = true;
+        getCustomerName({ customerEmail: this.customerEmail })
+            .then(result => {
+                this.customerName = result[0].Name;
+                this.customerId = result[0].Id;
+                this.customerError = null;
+            })
+            .catch(error => {
+                this.customerError = error;
+                this.customerName = null;
+                this.customerId = null;
+                console.error('Error fetching customer:', error);
+            })
+            .finally(() => {
+                this.isLoading = false;
+            });
+    }
+
     //Update the status after to some TriggerFlow to make it more dynamic
     buildRedemptionList() {
         const redemption = {
