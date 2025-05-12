@@ -11,6 +11,7 @@ public with sharing class MuleSoftPurchaseService {
 
     @AuraEnabled(cacheable=true)
     public static List<PurchaseDTO> fetchPurchases() {
+        System.debug('Fetching purchases from MuleSoft...');
         Http http = new Http();
         HttpRequest req = new HttpRequest();
         req.setEndpoint('callout:EcommersEvents/purchases');

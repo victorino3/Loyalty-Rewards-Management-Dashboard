@@ -40,6 +40,7 @@ public with sharing class MuleSoftAPIController {
 
     @AuraEnabled
     public static void runRewardAssignmentJobNow() {
+        System.debug('⚙️ Running reward assignment job immediately...');
         RewardAssignmentJobHandler.executeJob();
     }
 }
