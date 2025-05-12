@@ -4,6 +4,8 @@ import fetchRewardsFromMuleSoft from '@salesforce/apex/MuleSoftAPIController.fet
 import fetchCustomersFromMuleSoft from '@salesforce/apex/MuleSoftAPIController.fetchCustomersFromMuleSoft';
 import enqueueMuleSoftInsert from '@salesforce/apex/MuleSoftAPIController.enqueueMuleSoftInsert';
 import { NavigationMixin } from 'lightning/navigation';
+import runRewardAssignmentJobNow from '@salesforce/apex/MuleSoftAPIController.runRewardAssignmentJobNow';
+
 
 export default class AdminPanel extends NavigationMixin(LightningElement) {
     mode = 'form';
@@ -137,5 +139,16 @@ export default class AdminPanel extends NavigationMixin(LightningElement) {
     
     get hasCustomers() {
         return this.customers && this.customers.length > 0;
+    }
+
+    handleRunJobNow() {
+        runRewardAssignmentJobNow()
+            .then(() => {
+                this.showToast('Success', '🎯 Reward assignment job launched!', 'success');
+            })
+            .catch(error => {
+                console.error(error);
+                this.showToast('Error', '❌ Failed to start reward job.', 'error');
+            });
     }
 }
