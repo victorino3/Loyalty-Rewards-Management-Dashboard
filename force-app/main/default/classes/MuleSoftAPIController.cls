@@ -9,7 +9,6 @@ public with sharing class MuleSoftAPIController {
         HttpResponse res = http.send(req);
 
         if (res.getStatusCode() == 200) {
-            // Parse and map JSON to Reward__c records
             List<Reward__c> rewards = (List<Reward__c>) JSON.deserialize(res.getBody(), List<Reward__c>.class);
             return rewards;
         } else {

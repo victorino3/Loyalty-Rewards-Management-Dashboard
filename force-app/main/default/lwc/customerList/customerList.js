@@ -18,14 +18,14 @@ export default class CustomerList extends NavigationMixin(LightningElement)  {
         this.delayTimeout = setTimeout(() => {
             this.searchKey = value;
             this.findCustomers();
-        }, 300); // Debounce delay in ms
+        }, 300);
     }
     
     findCustomers() {
         if (!this.searchKey) {
             this.customers = [];
             this.isNoResult = false;
-            this.isLoading = false; // ✅ Reset spinner
+            this.isLoading = false; 
             return;
         }
     
@@ -36,14 +36,14 @@ export default class CustomerList extends NavigationMixin(LightningElement)  {
                 this.customers = result;
                 this.isNoResult = result.length === 0;
                 this.error = undefined;
-                this.isLoading = false; // ✅ Turn off spinner
+                this.isLoading = false; 
             })
             .catch((error) => {
                 this.error = error.body?.message || 'Unknown error';
                 this.customers = [];
             })
             .finally(() => {
-                this.isLoading = false; // ✅ Turn off spinner
+                this.isLoading = false;
             });
     }
     
