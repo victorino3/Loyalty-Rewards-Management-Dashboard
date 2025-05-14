@@ -51,46 +51,52 @@ public with sharing class RewardEvaluatorService {
 
     public static void sendEmailWrapper(List<RewardAssignmentResult> results) {
         List<Messaging.SingleEmailMessage> emails = new List<Messaging.SingleEmailMessage>();
-        if(!validateCustomerPoints(results[0].email, results[0].rewardName)){
-            List<RewardEvaluatorService.RewardAssignmentResult> results1 = new List<RewardEvaluatorService.RewardAssignmentResult>();
-            results1.email = result[0].email;
-            results1.rewardName = results[0].rewardName;
-            results1.message = 'You do not have enough points to redeem this reward.';
-            setErrorLog(results1);
-            return;
-        } else {
-            
-            for (Integer i = 0; i < results.size(); i++) {
-                RewardAssignmentResult result = results[i];
     
+        for (RewardAssignmentResult data : results) {
+            Boolean isEligible = validateCustomerPoints(data.email, data.rewardName);
+    
+            if (!isEligible) {
+                data.success = false;
+                data.message = 'Customer does not exist or lacks enough points to redeem reward.';
+                continue;
+            }
+    
+            try {
                 Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
-                email.setToAddresses(new String[] { result.email });
+                email.setToAddresses(new String[] { data.email });
                 email.setSubject('🎁 You’ve Earned a Reward!');
                 email.setPlainTextBody(
                     'Hi there,\n\n' +
-                    'Thanks for your recent purchase of ' + result.product + '.\n' +
-                    'You’ve earned a reward: "' + result.rewardName + '" worth ' + result.points + ' points.\n\n' +
+                    'Thanks for your recent purchase of ' + data.product + '.\n' +
+                    'You’ve earned a reward: "' + data.rewardName + '" worth ' + data.points + ' points.\n\n' +
                     'To redeem it, simply reply to this email with the word "redeem".\n\n' +
                     'Enjoy your reward!\n- Your Loyalty Team'
                 );
-    
                 emails.add(email);
+    
+                // Mark success now (since we're adding this to send)
+                data.success = true;
+                data.message = 'Email queued to be sent to.'+ data.email;
+            } catch (Exception e) {
+                data.success = false;
+                data.message = 'Failed to build email: ' + e.getMessage();
             }
         }
-
+    
         try {
-            Messaging.sendEmail(emails);
-            for (RewardAssignmentResult result : results) {
-                result.success = true;
-                result.message = 'Email sent successfully.';
+            if (!emails.isEmpty() && EmailLimitChecker.checkEmailLimits()) {
+                Messaging.sendEmail(emails);
             }
         } catch (Exception ex) {
             for (RewardAssignmentResult result : results) {
-                result.success = false;
-                result.message = 'Failed to send email: ' + ex.getMessage();
+                if (result.success) { // Only overwrite if previously marked success
+                    result.success = false;
+                    result.message = 'Failed to send email to: '+result.email+ 'Due to email limit or ' + ex.getMessage();
+                }
             }
         }
     }
+    
     public static void setErrorLog(List<RewardAssignmentResult> results) {
         List<Error_Log__c> errorLogs = new List<Error_Log__c>();
 
@@ -99,6 +105,11 @@ public with sharing class RewardEvaluatorService {
                 Error_Log__c errorLog = new Error_Log__c();
                 errorLog.Name = 'Email Error';
                 errorLog.Error_Message__c = 'Email in case '+result.email+ 'Error: '+result.message;
+                errorLogs.add(errorLog);
+            }else{
+                Error_Log__c errorLog = new Error_Log__c();
+                errorLog.Name = 'Email Success';
+                errorLog.Success_Message__c = 'Email in case '+result.email+ 'Success: '+result.message;
                 errorLogs.add(errorLog);
             }
         }
@@ -113,26 +124,26 @@ public with sharing class RewardEvaluatorService {
     }
 
     public static Boolean validateCustomerPoints(String email, String rewardName) {
-        if (!Schema.sObjectType.Customer__c.isAccessible()) {
-            System.debug('User does not have read access to Customer__c.');
+        if (!Schema.sObjectType.Customer__c.isAccessible() || !Schema.sObjectType.Reward__c.isAccessible()) {
             return false;
         }
-        List<Customer__c> customers = [SELECT Id, Email__c, Points_Balance__c FROM Customer__c WHERE Email__c = :email];
+    
+        List<Customer__c> customers = [SELECT Id, Email__c, Points_Balance__c FROM Customer__c WHERE Email__c = :email LIMIT 1];
         if (customers.isEmpty()) {
             return false;
         }
+    
         Customer__c customer = customers[0];
-        List<Reward__c> rewards = new List<Reward__c>();
-        if (Schema.sObjectType.Reward__c.isAccessible()) {
-            rewards = [SELECT Id, Name, Points_Required__c FROM Reward__c WHERE Name = :rewardName];
-        } else {
-            System.debug('User does not have read access to Reward__c.');
-        }
+    
+        List<Reward__c> rewards = [SELECT Id, Name, Points_Required__c FROM Reward__c WHERE Name = :rewardName LIMIT 1];
         if (rewards.isEmpty()) {
             return false;
         }
+    
         Reward__c reward = rewards[0];
+    
         return customer.Points_Balance__c >= reward.Points_Required__c;
     }
+    
 
 }
